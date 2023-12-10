@@ -24,7 +24,7 @@ def create_dataset(data_subset, patient_dir_base, transforms):
     subjects = []
     for index, row in tqdm.tqdm(data_subset.iterrows(), total=data_subset.shape[0]):
         patient_id = row['patient_id']
-        patient_dir = os.path.join(patient_dir_base, patient_id)
+        patient_dir = os.path.join(patient_dir_base, str(patient_id))
         temp_CT_folder = os.path.join(patient_dir, 'temp_CT')
         temp_seg_folder = os.path.join(patient_dir, 'temp_segs')
 
