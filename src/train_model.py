@@ -13,15 +13,11 @@ from model import CNN3DModel, train_loop, val_loop
 logging.basicConfig(filename='training_log.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Create dataloaders
-data = pd.read_csv("./final_500_splits.csv")
+data = pd.read_csv("./final_500_split.csv")
 
 train_data = data[data['set'] == 'train']
 val_data = data[data['set'] == 'val']
 test_data = data[data['set'] == 'test']
-
-train_dataset = create_dataset(train_data, './patient_data')
-val_dataset = create_dataset(val_data, './patient_data')
-test_dataset = create_dataset(test_data, './patient_data')
 
 training_transforms = tio.Compose([
     tio.ToCanonical(),
@@ -52,7 +48,7 @@ criterion_multiclass = nn.CrossEntropyLoss()
 
 train_losses = []
 val_losses = []
-epochs = 50
+epochs = 1
 best_val_loss = float('inf')
 
 for epoch in tqdm.tqdm(range(epochs)):
@@ -68,6 +64,7 @@ for epoch in tqdm.tqdm(range(epochs)):
         torch.save(model.state_dict(), f'checkpoints/model_epoch_{epoch+1}.pth')
         logging.info(f'Model saved at epoch {epoch+1}')
 
+# Plotting
 plt.plot(range(1, epochs + 1), train_losses, label='Train Loss')
 plt.plot(range(1, epochs + 1), val_losses, label='Validation Loss')
 plt.xlabel('Epoch')
