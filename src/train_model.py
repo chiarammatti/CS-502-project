@@ -5,10 +5,12 @@ import torchio as tio
 import torch.optim as optim
 import tqdm
 import matplotlib.pyplot as plt
+import logging
 
 from dataset_helper import create_dataset 
 from model import CNN3DModel, train_loop, val_loop
 
+logging.basicConfig(filename='training_log.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Create dataloaders
 data = pd.read_csv("./final_500_splits.csv")
@@ -51,14 +53,20 @@ criterion_multiclass = nn.CrossEntropyLoss()
 train_losses = []
 val_losses = []
 epochs = 50
+best_val_loss = float('inf')
 
 for epoch in tqdm.tqdm(range(epochs)):
     train_loss = train_loop(train_dataloader, model, criterion_binary, criterion_multiclass, optimizer)
     val_loss = val_loop(val_dataloader, model, criterion_binary, criterion_multiclass)
     train_losses.append(train_loss)
     val_losses.append(val_loss)
-    print(f"Epoch {epoch + 1}/{epochs} - Train Loss: {train_loss}, Val Loss: {val_loss}")
+    logging.info(f"Epoch {epoch + 1}/{epochs} - Train Loss: {train_loss}, Val Loss: {val_loss}")
 
+    # Save the model if validation loss has improved
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        torch.save(model.state_dict(), f'checkpoints/model_epoch_{epoch+1}.pth')
+        logging.info(f'Model saved at epoch {epoch+1}')
 
 plt.plot(range(1, epochs + 1), train_losses, label='Train Loss')
 plt.plot(range(1, epochs + 1), val_losses, label='Validation Loss')
@@ -66,4 +74,7 @@ plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.title('Training and Validation Losses')
 plt.legend()
+plt.savefig('loss_plot.png')
 plt.show()
+
+logging.info('Training completed')
