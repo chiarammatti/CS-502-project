@@ -43,13 +43,22 @@ def create_dataset(data_subset, patient_dir_base, transforms):
         ]
         combined_kidney_mask = combine_masks_and_create_labelmap(kidney_paths)
 
+        # Combine bowel masks
+        bowel_paths = [
+            os.path.join(temp_seg_folder, "duodenum.nii.gz"),
+            os.path.join(temp_seg_folder, "colon.nii.gz"),
+            os.path.join(temp_seg_folder, "small_bowel.nii.gz"),
+            os.path.join(temp_seg_folder, "esophagus.nii.gz")
+        ]
+        combined_bowel_mask = combine_masks_and_create_labelmap(bowel_paths)
+
         # Create a tio.Subject
         subject = tio.Subject(
             CT=tio.ScalarImage(ct_path),
             segmentation_kidneys=resample_transform(tio.LabelMap(tensor=combined_kidney_mask)),
             segmentation_liver=resample_transform(tio.LabelMap(os.path.join(temp_seg_folder, "liver.nii.gz"))),
             segmentation_spleen=resample_transform(tio.LabelMap(os.path.join(temp_seg_folder, "spleen.nii.gz"))),
-            segmentation_bowel=resample_transform(tio.LabelMap(os.path.join(temp_seg_folder, "small_bowel.nii.gz"))),
+            segmentation_bowel=resample_transform(tio.LabelMap(tensor=combined_bowel_mask)),
             patient_id=patient_id,
         )
         subjects.append(subject)
