@@ -23,12 +23,16 @@ training_transforms = tio.Compose([
     tio.ToCanonical(),
     tio.Resize((128, 128, -1)),
     tio.ZNormalization(masking_method=tio.ZNormalization.mean),
+    tio.CropOrPad(
+    (128, 128, 32)),
 ])
 
 validation_transforms = tio.Compose([
     tio.ToCanonical(),
     tio.Resize((128, 128, -1)),
     tio.ZNormalization(masking_method=tio.ZNormalization.mean),
+    tio.CropOrPad(
+    (128, 128, 32)),
 ])
 
 train_dataloader = create_dataset(data[data['set'] == 'train'], './patient_data', training_transforms)
