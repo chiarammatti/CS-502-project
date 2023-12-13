@@ -1,4 +1,4 @@
-# CS-502-project: AI Based Abdominal Trauma Detection
+# CS-502-project: AI-Based Abdominal Trauma Detection
 
 This is the project repository of Group 3 for EPFL's course Deep Learning in Biomedicine (CS-502). It contains all the code to develop a classifier to accurately detect and classify the type and severity of injuries within the abdomen based on CT scans. This project was inspired by the [RSNA 2023 Abdominal Trauma Detection Challenge](https://www.kaggle.com/competitions/rsna-2023-abdominal-trauma-detection/)
 
