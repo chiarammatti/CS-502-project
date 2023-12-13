@@ -4,8 +4,8 @@ This is the project repository of Group 3 for EPFL's course Deep Learning in Bio
 
 ## Data Loading 
 The dataset used was sourced from the RSNA 2023 Abdominal Trauma Detection Challenge and uploaded from Kaggle to Google Cloud Storage (GCS) using the provided `fix_and_load_data.py` script. To avoid future errors, during the uploading process the mandatory "Modality" attribute of DICOM files was added, as many of the provided images where missing it.  
-Subsequently, to be able to work with 3D models, all the DICOM files were converted into NIfTI format and uploaded back to Google Cloud Storage, using `???`.
-To direcly have access to GCS ????. 
+Subsequently, to be able to work with 3D models, all the DICOM files were converted into NIfTI format and uploaded back to Google Cloud Storage, using `nifti_conversion.py`.
+To direcly have access to GCS bucket please follow [this link](https://console.cloud.google.com/storage/browser/rsna-competition-2023). 
 
 ## Usage
 
