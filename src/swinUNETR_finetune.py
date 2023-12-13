@@ -29,15 +29,15 @@ from monai.data import (
     decollate_batch,
     set_track_meta,
 )
-
 # from shutil import copyfile
 
 # copyfile(src = "../input/monai-swunet/monai_swingunetr.py", dst = "../working/monai_swingunetr.py")
 from swinUNETR_base import *
 
 
+
 class ViT3DModel(nn.Module):
-    def __init__(self, in_channels, num_classes):
+    def __init__(self, in_channels=1, num_classes=14):
         super(ViT3DModel, self).__init__()
         model_dict = torch.load("./swin_unetr.base_5000ep_f48_lr2e-4_pretrained.pt")["state_dict"]
         self.base_model = SwinUNETR(
@@ -46,7 +46,7 @@ class ViT3DModel(nn.Module):
                 out_channels=num_classes,
                 feature_size=48,
                 use_checkpoint=False,
-            ).to(device)
+            )
         
           
         self.base_model.load_state_dict(model_dict, strict=False)
@@ -74,10 +74,10 @@ class ViT3DModel(nn.Module):
         num_features = 4*4*768
 
         # Define output layers for each organ's classification
-        self.fc_bowel = nn.Linear(num_features, 2).to(device)  # binary classification
-        self.fc_liver = nn.Linear(num_features, 3).to(device)  # multiclass classification
-        self.fc_kidney = nn.Linear(num_features, 3).to(device)
-        self.fc_spleen = nn.Linear(num_features, 3).to(device)
+        self.fc_bowel = nn.Linear(num_features, 2)  # binary classification
+        self.fc_liver = nn.Linear(num_features, 3)  # multiclass classification
+        self.fc_kidney = nn.Linear(num_features, 3)
+        self.fc_spleen = nn.Linear(num_features, 3)
 
     def apply_mask(self, inputs, mask):
         return inputs * mask.unsqueeze(1)  # Adding channel dimension to mask
