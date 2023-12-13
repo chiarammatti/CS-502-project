@@ -16,8 +16,10 @@ To direcly have access to GCS bucket please follow [this link](https://console.c
 Note: The models used are defined in `model.py`. SwinUNETR pretrained weights can be downloaded [here](https://github.com/Project-MONAI/MONAI-extra-test-data/releases/download/0.8.1/swin_unetr.base_5000ep_f48_lr2e-4_pretrained.pt).
 
 #### Testing
-- Run `save_data.py` to download the data from GCS locally. Note that only the subjects specified in CSV file `final_500_split.csv` will be downloaded (CT scans and corresponding segmentations)  
+- Run `save_data.py` to download the data from GCS locally. Note that only the subjects specified in CSV file `final_500_split.csv` will be downloaded (CT scans and corresponding segmentations)
 - Run `inference.py` to evaluate the model
+
+Note: The models weights can be downloaded from [this Google Drive folder](https://drive.google.com/drive/folders/1RF99qcKKCKSie-4v6V96Cu1t4wuphQrF?usp=sharing)
 
 
 
