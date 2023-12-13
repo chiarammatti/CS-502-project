@@ -1,0 +1,21 @@
+name: abdominal_ct
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python = 3.8.3
+  - pip
+  - pip:
+    - dicom2nifti==2.4.9
+    - google-cloud-storage==2.13.0
+    - matplotlib==3.7.3
+    - monai==1.3.0
+    - nibabel==5.1.0
+    - pandas==1.5.3
+    - pydicom==2.4.3
+    - torch==2.0.1
+    - torchio==0.19.1
+    - torchvision==0.15.2
+    - totalsegmentator==1.5.7
+    - tqdm==4.66.1
+    - transformers==4.21.3
