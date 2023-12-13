@@ -3,10 +3,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models.video import r3d_18
 import pandas as pd 
+from swinUNETR_base import *
+
 
 data = pd.read_csv("./final_500_splits.csv")
 label_dict = data.set_index('patient_id').to_dict(orient='index')
-
 
 
 class CNN3DModel(nn.Module):
@@ -35,7 +36,6 @@ class CNN3DModel(nn.Module):
         
         # Define output layers for each organ's classification
         self.fc_bowel = nn.Linear(num_features, 2)  # binary classification
-        #self.fc_extravasation = nn.Linear(num_features, 2) 
         self.fc_liver = nn.Linear(num_features, 3)  # multiclass classification
         self.fc_kidney = nn.Linear(num_features, 3)
         self.fc_spleen = nn.Linear(num_features, 3)
@@ -52,12 +52,70 @@ class CNN3DModel(nn.Module):
 
         # Classification for each organ
         bowel = self.fc_bowel(features['bowel'])
-        #extravasation = self.fc_extravasation(features['extravasation'])
         liver = self.fc_liver(features['liver'])
         kidney = self.fc_kidney(features['kidneys'])
         spleen = self.fc_spleen(features['spleen'])
 
-        return bowel, liver, kidney, spleen #extravasation, 
+        return bowel, liver, kidney, spleen
+    
+
+class ViT3DModel(nn.Module):
+    def __init__(self, in_channels=1, num_classes=14):
+        super(ViT3DModel, self).__init__()
+        model_dict = torch.load("./swin_unetr.base_5000ep_f48_lr2e-4_pretrained.pt")["state_dict"]
+        self.base_model = SwinUNETR(
+                img_size=(128,128,32),
+                in_channels=in_channels,
+                out_channels=num_classes,
+                feature_size=48,
+                use_checkpoint=False,
+            )
+        
+          
+        self.base_model.load_state_dict(model_dict, strict=False)
+
+        # Option b
+        #for name, param in self.base_model.named_parameters():
+        #    if not name.startswith("encoder1") and not name.startswith("encoder2"):
+        #        param.requires_grad=False
+        # Option a 
+        for name, param in self.base_model.named_parameters():
+            param.requires_grad=False
+        
+        # remove decoders
+        del self.base_model.decoder1
+        del self.base_model.decoder2
+        del self.base_model.decoder3
+        del self.base_model.decoder4
+        del self.base_model.decoder5
+        del self.base_model.out
+
+
+        num_features = 4*4*768
+
+        # Define output layers for each organ's classification
+        self.fc_bowel = nn.Linear(num_features, 2)  # binary classification
+        self.fc_liver = nn.Linear(num_features, 3)  # multiclass classification
+        self.fc_kidney = nn.Linear(num_features, 3)
+        self.fc_spleen = nn.Linear(num_features, 3)
+
+    def apply_mask(self, inputs, mask):
+        return inputs * mask.unsqueeze(1)  # Adding channel dimension to mask
+
+    def forward(self, x, masks):
+        # Apply masks and extract features for each organ
+        features = {}
+        for organ, mask in masks.items():
+            masked_input = self.apply_mask(x, mask)
+            features[organ] = self.base_model(masked_input)
+        
+        bowel = self.fc_bowel(features['bowel'].view(1,-1))
+        liver = self.fc_liver(features['liver'].view(1,-1))
+        kidney = self.fc_kidney(features['kidneys'].view(1,-1))
+        spleen = self.fc_spleen(features['spleen'].view(1,-1))
+
+        return bowel, liver, kidney, spleen
+
 
 def calculate_loss(outputs, labels, criterion_binary, criterion_multiclass):
     outputs_bowel, outputs_liver, outputs_kidneys, outputs_spleen = outputs
